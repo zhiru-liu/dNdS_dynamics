@@ -63,9 +63,9 @@ def compute_biallelic_snvs(snvs, alleles, coverage):
     # now set bi sites
     true_major_alleles[bi_sites] = major_alleles[bi_sites]
     # major and alt are not well defined for ties (e.g. alt and major counts are the same)
-    # in these cases we set the major allele to the reference allele
+    # in these cases we set the major allele to the reference allele, if possible
     tie_mask = bi_sites & ((allele_counts.min(axis=1))==(allele_counts.max(axis=1)))
-    true_major_alleles[tie_mask] = refs[tie_mask]
+    # true_major_alleles[tie_mask] = refs[tie_mask]
 
     # we still need to identify the alt allele at the tied sites
     # since there are not that many of these sites, we can loop through them 
@@ -73,9 +73,14 @@ def compute_biallelic_snvs(snvs, alleles, coverage):
         # find nonzero column names, these are the two segregating alleles
         tie_alleles = allele_counts.loc[loc].dropna().index.tolist()
         # find the one different from reference
-        tie_alleles.remove(true_major_alleles[loc])
-        # finally set the alt allele
-        true_alt_alleles[loc] = tie_alleles[0]
+        if refs[loc] in tie_alleles:
+            tie_alleles.remove(refs[loc])
+            true_major_alleles[loc] = refs[loc]
+            true_alt_alleles[loc] = tie_alleles[0]
+        else:
+            # if reference is not one of the two segregating alleles, just set the two tied alleles randomly
+            true_major_alleles[loc] = tie_alleles[1]
+            true_alt_alleles[loc] = tie_alleles[0]
 
     # lastly, group all relevant information for the biallelic sites into a dataframe
     bi_mask = ~multi_sites
@@ -146,10 +151,10 @@ class SNVHelper:
 
         logging.info(f'Loading data for {species_name}')
         logging.info(f'Configuration: compute_bi_snvs={compute_bi_snvs}, save_bi_snvs={save_bi_snvs}, format={self.format}, annotate={annotate}')
-        logging.info(f'format: {self.format}')
 
         self.full_snvs = self.load_df(self.all_snvs_path, format=self.format)
         self.coverage = self.load_df(self.coverage_path, format=self.format)
+        self.samples = self.coverage.columns
 
         if compute_bi_snvs or not self.bi_snvs_path.exists():
             self.snvs, self.multi_sites = compute_biallelic_snvs(self.full_snvs, self.load_df(self.allele_path, format=self.format), self.coverage)
@@ -161,13 +166,15 @@ class SNVHelper:
             # multi_sites are the sites in full_snvs but not in snvs
             multi_mask = pd.Series(~self.full_snvs.index.isin(self.snvs.index), self.full_snvs.index)
             self.multi_sites = multi_mask
-
+        self.core_to_snvs = self.coverage.index.isin(self.snvs.index)
         if mask_multi_sites:
             # ignore all sites with more than two segregating alleles
             multi_site_index = self.multi_sites[self.multi_sites].index
             self.coverage.loc[multi_site_index] = False
         if annotate:
             self.annotate_snvs()
+        else:
+            self.annotated=False
 
     # static helper for loading dataframes
     @staticmethod
@@ -240,6 +247,7 @@ class SNVHelper:
 
         snv_types = [self.mut_df.at[idx, col] for idx, col in zip(self.snvs.index, self.snvs['Alt'])]
         self.snv_types = pd.Series(snv_types, index=self.snvs.index)
+        self.annotated = True
         logging.info('Done annotating SNVs')
 
     def compute_pairwise_snvs(self, sample1, sample2):
@@ -275,10 +283,48 @@ class SNVHelper:
         """
         Sample a random pair of samples
         """
-        samples = self.coverage.columns
-        sample1, sample2 = np.random.choice(samples, 2, replace=False)
+        sample1, sample2 = np.random.choice(self.samples, 2, replace=False)
         return sample1, sample2
-        
+
+    def sample_random_fully_recombined_pair(self, recomb_threshold=config.fully_recombined_threshold):
+        """
+        Sample a random pair of samples with full recombination
+        """
+        if not self.check_if_any_pair_fully_recombined(recomb_threshold):
+            # do not want to stuck in infinite loop if no fully recombined pairs
+            raise ValueError('No fully recombined pairs found')
+
+        sample1, sample2 = self.sample_random_pair()
+        # make sure the samples are fully recombined
+        while self.get_pair_identical_block(sample1, sample2) > recomb_threshold:
+            sample1, sample2 = self.sample_random_pair()
+        return sample1, sample2
+    
+    def check_if_any_pair_fully_recombined(self, recomb_threshold=config.fully_recombined_threshold):
+        """
+        Check if any pair of samples is fully recombined
+        """
+        if not hasattr(self, 'identical_block_frac'):
+            self.load_identical_block()
+        return (self.identical_block_frac<=recomb_threshold).any().any()
+
+    def get_pair_identical_block(self, sample1, sample2):
+        """
+        Get the fraction of identical blocks between two samples
+        """
+        if not hasattr(self, 'identical_block_frac'):
+            self.load_identical_block()
+        return self.identical_block_frac.at[sample1, sample2]
+
+    def load_identical_block(self):
+        try:
+            identical_block_frac = pd.read_csv(config.identical_fraction_path / f"{self.species_name}.csv", index_col=None, header=None)
+        except FileNotFoundError:
+            logging.error('Identical block fraction file not found')
+            return
+        identical_block_frac.set_index(self.samples, inplace=True)
+        identical_block_frac.columns = self.samples
+        self.identical_block_frac = identical_block_frac
 # older slower version
 # def compute_biallelic_snvs(snvs_df, allele_df, coverage_df):
 #     """

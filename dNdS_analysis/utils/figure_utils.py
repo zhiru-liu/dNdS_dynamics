@@ -1,3 +1,10 @@
+import matplotlib as mpl
+
+mpl.rcParams['font.size'] = 7
+mpl.rcParams['lines.linewidth'] = 1
+mpl.rcParams['legend.fontsize'] = 'small'
+mpl.rcParams['legend.frameon'] = False
+
 def get_pretty_species_name(species_name, include_number=False, manual=False):
     # convert gut microbiome species name to pretty name for plotting
     items = species_name.split("_")

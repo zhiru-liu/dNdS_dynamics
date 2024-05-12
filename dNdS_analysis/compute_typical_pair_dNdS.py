@@ -1,11 +1,19 @@
+"""
+Analogous to the compute_close_pair_dNdS.py script, this script is used to compute dNdS for typical (i.e. fully recombined pairs with minimal clonal regions).
+The script randomly selects fully recombined pairs and computes various metrics
+such as core differences, core lengths, and breakdown of 1D mutations. The results are saved in a CSV file for each species.
+"""
+
 import pandas as pd
 import logging
 from dNdS_analysis.utils import snv_utils
 import dNdS_analysis.config as config
 
-def compute_typical_pair(species, num_pairs=100):
-    snv_helper = snv_utils.SNVHelper(species, compute_bi_snvs=False)
-    snv_helper.annotate_snvs()
+def compute_typical_pair(species, num_pairs=20):
+    snv_helper = snv_utils.SNVHelper(species, compute_bi_snvs=False, annotate=True)
+    if not snv_helper.check_if_any_pair_fully_recombined():
+        logging.info(f'Species: {species} has no fully recombined pair')
+        return
 
     columns = ['species_name','sample 1','sample 2',
                'core_diff','core_len',
@@ -18,7 +26,7 @@ def compute_typical_pair(species, num_pairs=100):
     results_df['species_name'] = species
 
     for i in range(num_pairs):
-        sample1, sample2 = snv_helper.sample_random_pair()
+        sample1, sample2 = snv_helper.sample_random_fully_recombined_pair()
         logging.info(f'Computing dNdS for pair: {sample1} and {sample2}')
         diff_sites = snv_helper.compute_pairwise_snvs(sample1, sample2)
         covered_mask = snv_helper.compute_pairwise_coverage(sample1, sample2)
@@ -45,9 +53,20 @@ def compute_typical_pair(species, num_pairs=100):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
-    species = 'Alistipes_finegoldii_56071'
-    typical_pair_folder = config.data_path / 'gut_microbiome_typical_pair_dNdS' / f'{species}.csv'
-    logging.info(f'Computing typical pair for species: {species}')
-    results_df = compute_typical_pair(species)
-    results_df.to_csv(typical_pair_folder, index=False)
-    logging.info(f'Saved typical pair for species: {species} to {typical_pair_folder}')
+
+    snv_folder_list = config.snv_data_path.glob('*')
+    for folder in snv_folder_list:
+        folder_name = folder.name
+        if folder_name.startswith('.'):
+            continue
+        species = folder_name
+        # species = 'Alistipes_finegoldii_56071'
+        typical_pair_folder = config.data_path / 'gut_microbiome_typical_pair_dNdS' / f'{species}.csv'
+        if typical_pair_folder.exists():
+            logging.info(f'Typical pair for species: {species} already exists at {typical_pair_folder}')
+            continue
+        logging.info(f'Computing typical pair for species: {species}')
+        results_df = compute_typical_pair(species)
+        if results_df is not None:
+            results_df.to_csv(typical_pair_folder, index=False)
+            logging.info(f'Saved typical pair for species: {species} to {typical_pair_folder}')
