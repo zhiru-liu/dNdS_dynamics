@@ -41,12 +41,9 @@ full_dnds_df = pd.concat(dnds_dfs)
 # clonal_dN = row['clonal_diff_1D'] / row['clonal_len_1D'].astype(float)
 # print(clonal_dN / naive_clonal_dS)
 
-fig, axes = plt.subplots(1, 3, figsize=(8, 1.8), dpi=200)
-
-mpl.rcParams['font.size'] = 7
-mpl.rcParams['lines.linewidth'] = 1
-mpl.rcParams['legend.fontsize'] = 'small'
-mpl.rcParams['legend.frameon'] = False
+mpl.rcParams['font.size'] = 8
+fig, axes = plt.subplots(1, 3, figsize=(7, 2), dpi=300)
+plt.subplots_adjust(wspace=0.08)
 
 dS1, dS2 = computed_poisson_thinning(full_dnds_df['core_diff_4D'], full_dnds_df['core_len_4D'])
 naive_dS = full_dnds_df['core_diff_4D'] / full_dnds_df['core_len_4D'].astype(float)
@@ -88,5 +85,7 @@ axes[0].set_ylabel('$dN/dS$')
 axes[0].set_title('Full genome')
 axes[1].set_title('Recombined regions')
 axes[2].set_title('Clonal regions')
+axes[1].set_yticklabels([])
+axes[2].set_yticklabels([])
 axes[0].legend()
-fig.savefig(config.fig_path / 'dNdS_test.pdf', bbox_inches='tight')
+fig.savefig(config.fig_path / 'dNdS.pdf', bbox_inches='tight')

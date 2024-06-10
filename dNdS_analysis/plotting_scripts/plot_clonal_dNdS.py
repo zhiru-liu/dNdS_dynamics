@@ -4,10 +4,14 @@ import numpy as np
 import os
 import pandas as pd
 import scipy.stats
+import matplotlib as mpl
+
 import dNdS_analysis.config as config
 from dNdS_analysis.utils.dynamics_utils import computed_poisson_thinning
 import dNdS_analysis.utils.figure_utils as figure_utils
 from dNdS_analysis.utils.theory_utils import dNdS_purify_curve
+
+mpl.rcParams['legend.frameon'] = True
 
 def plot_scatter(dat, ax):
     vals = dat.values
@@ -15,7 +19,8 @@ def plot_scatter(dat, ax):
     colors = kernel(vals.T)
     cmin, cmax = colors.min(), colors.max()
 
-    ax = sns.scatterplot(data=dat, x="dS", y="dNdS", hue=colors, hue_norm=(-3000, cmax), ax=ax, palette='Blues', rasterized=True, s=3, legend=False)
+    ax = sns.scatterplot(data=dat, x="dS", y="dNdS", hue=colors, hue_norm=(-3000, cmax), 
+                         ax=ax, palette='Blues', rasterized=True, s=3, legend=False)
 
     # now plot the purifying selection curve
     fd = 0.9
@@ -23,7 +28,7 @@ def plot_scatter(dat, ax):
     purify_curve_data = pd.DataFrame()
     purify_curve_data['dS'] = xs
     purify_curve_data.set_index('dS', inplace=True)
-    for sbymu in [1e5, 1e4, 1e3]:
+    for sbymu in [1e3, 1e4, 1e5]:
         dNdS_val = dNdS_purify_curve(xs, fd, sbymu)
         name = '$s/\mu=10^{0:.0f}$'.format(np.log10(sbymu))
         purify_curve_data[name] = dNdS_val
@@ -51,14 +56,14 @@ def plot_corr_barh(plot_df, ax):
     # plt.xlim(-1, 1)
     # corr_df.head()
     ax.set_xlabel('Pearson r')
-    axes[1].set_ylim(-1, len(plot_df))
-    axes[1].yaxis.tick_right()
-    axes[1].axvline(plot_df.iloc[-1]['Pearson r'], linewidth=1, color='k', linestyle='--')
+    ax.set_ylim(-1, len(plot_df))
+    ax.yaxis.tick_right()
+    ax.axvline(plot_df.iloc[-1]['Pearson r'], linewidth=1, color='k', linestyle='--')
 
 if __name__ == '__main__':
     # ax = sns.scatterplot(data=dat, x="dS", y="dNdS", c=colors, cmap="Reds",rasterized=True, s=2, vmin=cmin/10, vmax=cmax)
 
-    # TODO: 24/05/10: update to close pair dNdS once everything is finished
+    # TODO: 24/05/24 add clonal ones
     dnds_basepath = os.path.join(config.data_path, 'gut_microbiome_dNdS')
     dnds_dfs = []
 
@@ -98,6 +103,9 @@ if __name__ == '__main__':
         if file.startswith('.'):
             continue
         species_name = file.split('.')[0]
+        if species_name in config.blacklist_species:
+            # some species are blacklisted since recombination detection is not reliable
+            continue
         dnds_df = pd.read_csv(os.path.join(typical_pair_dnds_basepath, species_name + '.csv'))
         dnds_df.set_index(['species_name', 'sample 1', 'sample 2'], inplace=True)
         # note: some of the values will be NaN because they have no recombination events
@@ -119,32 +127,41 @@ if __name__ == '__main__':
     # zhiru: save the scatter data in case of publication need
     # dat.to_csv(os.path.join(config.fig_dat_dir, 'clonal_dNdS_scatter.csv'), index=False)
 
-    # fig, ax = plt.subplots(figsize=(4, 3))
-    fig = plt.figure(figsize=(5, 3))
-    grid = plt.GridSpec(1, 2, wspace=0.25, hspace=0.3, width_ratios=[5, 1], figure=fig)
-    axes = [None, None]
-    axes[0] = plt.subplot(grid[0, 0])
-    axes[1] = plt.subplot(grid[0, 1])
+    # set up two subplots for scatter and correlation coefficients
+    # fig = plt.figure(figsize=(5, 3))
+    # grid = plt.GridSpec(1, 2, wspace=0.25, hspace=0.3, width_ratios=[5, 1], figure=fig)
+    # axes = [None, None]
+    # axes[0] = plt.subplot(grid[0, 0])
+    # axes[1] = plt.subplot(grid[0, 1])
+    # ax = axes[0]
 
-    plot_scatter(close_res, axes[0])
+    fig, ax = plt.subplots(figsize=(6, 3))
+    plot_scatter(close_res, ax)
+    plt.axvspan(1e-3, 1, color='gray', alpha=0.1)
     # adding the typical pair results
     # use x marker
-    sns.scatterplot(data=typical_res, x="dS", y="dNdS", ax=axes[0], rasterized=True, s=3, legend=False, color='tab:grey', marker='x')
+    sns.scatterplot(data=typical_res, x="dS", y="dNdS", ax=ax, 
+                    rasterized=True, s=10, legend=False, color='black', marker='x',
+                    label='Average per species\n(unrelated pairs)')
+    plt.legend()
 
 
-    # if also plotting correlation coefficients
-    # need to be computed in plot_clonal_dNdS_all_species first
-    corr_df = pd.read_csv(os.path.join(config.table_path, 'clonal_dNdS_correlation.csv'))
-    corr_df['species'] = corr_df['species'].apply(figure_utils.get_pretty_species_name)
-    corr_df.sort_values('species', inplace=True, ascending=False)
+    """
+    Plotting corr coefficients
+    """
+    # # if also plotting correlation coefficients
+    # # need to be computed in plot_clonal_dNdS_all_species first
+    # corr_df = pd.read_csv(os.path.join(config.table_path, 'clonal_dNdS_correlation.csv'))
+    # corr_df['species'] = corr_df['species'].apply(figure_utils.get_pretty_species_name)
+    # corr_df.sort_values('species', inplace=True, ascending=False)
 
-    # also compute the correlation coefficient for the combined data
-    pearson_res = scipy.stats.pearsonr(close_res['dS'], close_res['dNdS'])
-    spearman_res = scipy.stats.spearmanr(close_res['dS'], close_res['dNdS'])
-    plot_df = pd.DataFrame()
-    plot_df['Species'] = corr_df['species'].to_list() + ['All species']
-    plot_df['Pearson r'] = corr_df['pearsonr'].to_list() + [pearson_res[0]]
-    plot_df['Pearson p'] = corr_df['pearsonp'].to_list() + [pearson_res[1]]
-    plot_corr_barh(plot_df, axes[1])
+    # # also compute the correlation coefficient for the combined data
+    # pearson_res = scipy.stats.pearsonr(close_res['dS'], close_res['dNdS'])
+    # spearman_res = scipy.stats.spearmanr(close_res['dS'], close_res['dNdS'])
+    # plot_df = pd.DataFrame()
+    # plot_df['Species'] = corr_df['species'].to_list() + ['All species']
+    # plot_df['Pearson r'] = corr_df['pearsonr'].to_list() + [pearson_res[0]]
+    # plot_df['Pearson p'] = corr_df['pearsonp'].to_list() + [pearson_res[1]]
+    # plot_corr_barh(plot_df, axes[1])
 
-    plt.savefig(config.fig_path / 'clonal_dNdS_test.pdf', dpi=300, bbox_inches='tight')
+    plt.savefig(config.fig_path / 'clonal_dNdS.pdf', dpi=300, bbox_inches='tight')
