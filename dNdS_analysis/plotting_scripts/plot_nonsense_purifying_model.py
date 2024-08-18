@@ -33,6 +33,13 @@ dNdS_val_non = dNdS_purify_curve(xs, 1-fs, sbymu)
 
 ax.loglog(xs, dNdS_val_non / dNdS_val_mis, '--', color='k', label='$s_{ns}=4s_{ms}$')
 
+# finally, plot a much stronger selection coefficient for nonsense mutations
+sbymu = 8e4
+fs = 0.1 * 0.07
+dNdS_val_non = dNdS_purify_curve(xs, 1-fs, sbymu)
+
+ax.loglog(xs, dNdS_val_non / dNdS_val_mis, '-', color='k', label='$s_{ns}=8s_{ms}$')
+
 
 # now plot the empirical data for reference
 yerr = np.sqrt(clonal_res['ns SE']**2 + clonal_res['ms SE']**2)

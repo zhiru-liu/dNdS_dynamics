@@ -2,10 +2,21 @@ import sys
 import os
 from pathlib import Path
 
-# might not need this project anymore
-microbiome_evolution_path = "/Users/Device6/Documents/Research/bgoodlab/microbiome_evolution"
+# specify the paths to some necessary data
+
+# Compact SNV catalogs of all the QP genomes generated in Garud & Good et al 2019
 snv_data_path = Path("/Volumes/Botein/GarudGood2019_snvs")
+# the reference genome fasta files in the MIDAS database; for annotating SNV type (missense, synonymous, etc.)
 ref_genome_path = Path("/Volumes/Botein/LiuGood2024_files/microbiome_data/midas_db/rep_genomes")
+
+# Need two additional things from Liu & Good 2024 data
+# 1. the CP-HMM intermediate file to find close pairs with no detected recombination
+# 2. the fraction of identical blocks to identify fully recombined pairs
+# Once dNdS is computed, these pairs can be found in the output csv files
+LiuGood2024_path = Path("/Volumes/Botein/LiuGood2024_files/zhiru_analysis")
+identical_fraction_path = LiuGood2024_path / 'pairwise_clonal_fraction' / 'between_hosts'
+# if less than 5% identical, then this pair probably has no clonal region left
+fully_recombined_threshold = 0.05
 
 # Get the current folder path (directory of the script file)
 current_folder_path = Path(__file__).resolve().parent
@@ -21,17 +32,4 @@ table_path = root_path / "tables"
 data_path = root_path / "data"
 fig_dat_path = data_path / "figure_data"
 
-# Might need to use the fraction of identical fraction in Liu&Good 2024
-identical_fraction_path = Path('/Volumes/Botein/LiuGood2024_files/zhiru_analysis/pairwise_clonal_fraction/between_hosts')
-# if less than 5% identical, then this pair probably has no clonal region left
-fully_recombined_threshold = 0.05
-
-# old os.path codes
-# current_folder_path = os.path.dirname(os.path.abspath(__file__))
-# root_path = os.path.dirname(current_folder_path)
-
-# fig_dir = os.path.join(root_path, "figs")
-# table_path = os.path.join(root_path, "tables")
-
-# data_path = os.path.join(root_path, "data")
-# fig_dat_dir = os.path.join(data_path, "figure_data")
+blacklist_species = ['Lachnospiraceae_bacterium_51870']

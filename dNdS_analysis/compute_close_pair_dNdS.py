@@ -70,6 +70,8 @@ for folder in snv_folder_list:
 
     # main work: loop through all pairs
     i = 0
+    # TODO: 05/11/2024 - add pairs without recombination events here; can skip all recombination fields in that case
+    # TODO: alternatively, have a separate script to compute dNdS for all clonal pairs (no recombination events)
     for pair, grouped in species_transfers.groupby(['Sample 1', 'Sample 2']):
         # build a Interval index for this pair
         pair_transfer_df = grouped
@@ -78,19 +80,6 @@ for folder in snv_folder_list:
         sample1 = str(sample1)
         sample2 = str(sample2)
         logging.info(f'Computing dNdS for pair: {sample1} and {sample2}')
-
-        """ TODO: debug this recombination mask; Reference genome is likely messed up"""
-        # # build recombination mask
-        # location_intervals = pd.IntervalIndex.from_arrays(pair_transfer_df['Reference genome start loc'], pair_transfer_df['Reference genome end loc'], closed='both')
-        # # Create MultiIndex using 'Contig' and the interval index for 'Location'
-        # recombination_index = pd.MultiIndex.from_arrays([pair_transfer_df['Reference contig'], location_intervals], names=['Contig', 'Location'])
-
-        # # this is the slow step; I don't have better ideas to optimize this
-        # # looping over recombination events is even slower
-        # # shape: core genome length
-        # recombination_mask = snv_helper.coverage.index.isin(recombination_index)
-        # # shape: snv length
-        # recombination_snv_mask = snv_helper.snvs.index.isin(recombination_index)
 
         recombination_mask = np.zeros(snv_helper.coverage.shape[0]).astype(bool)
         for idx, row in pair_transfer_df.iterrows():
