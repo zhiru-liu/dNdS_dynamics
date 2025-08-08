@@ -5,7 +5,7 @@ from pathlib import Path
 # specify the paths to some necessary data
 
 # Compact SNV catalogs of all the QP genomes generated in Garud & Good et al 2019
-snv_data_path = Path("/Volumes/Botein/GarudGood2019_snvs")
+snv_data_path = Path("/Volumes/Botein/GarudGood2019_snvs/snvs_feather")
 # the reference genome fasta files in the MIDAS database; for annotating SNV type (missense, synonymous, etc.)
 ref_genome_path = Path("/Volumes/Botein/LiuGood2024_files/microbiome_data/midas_db/rep_genomes")
 
@@ -32,4 +32,5 @@ table_path = root_path / "tables"
 data_path = root_path / "data"
 fig_dat_path = data_path / "figure_data"
 
+# This species is abnormal in that it has no fully recombined pairs; so exclude it from the analysis
 blacklist_species = ['Lachnospiraceae_bacterium_51870']

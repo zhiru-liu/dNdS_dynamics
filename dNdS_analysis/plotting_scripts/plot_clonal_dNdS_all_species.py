@@ -20,9 +20,6 @@ for file in os.listdir(dnds_basepath):
     if file.endswith('mut_opportunity.csv'):
         continue
     species_name = file.split('.')[0]
-    # transfer_df_path = os.path.join(config.analysis_directory, "closely_related", 'third_pass',
-    #                                 species_name + '_all_transfers.pickle')
-    # transfer_df = pd.read_pickle(transfer_df_path)
     dnds_df = pd.read_csv(os.path.join(dnds_basepath, species_name + '.csv'))
     dnds_df.set_index(['species_name', 'sample 1', 'sample 2'], inplace=True)
     dnds_df['Clonal fraction'] = pair_to_cf

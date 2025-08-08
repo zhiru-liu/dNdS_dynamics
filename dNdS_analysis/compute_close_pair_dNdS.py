@@ -25,14 +25,14 @@ from Bio import SeqIO
 import gzip
 import logging
 
-sys.path.append('/Users/Device6/Documents/Research/bgoodlab/UHGG/uhgg_helper')
-import annotation_utils
+sys.path.append('/Users/Device6/Documents/Research/bgoodlab/UHGG/')
+import uhgg_helper.annotation_utils as annotation_utils
 
-from dNdS_analysis.utils import snv_utils
+from dNdS_analysis.utils import snv_utils, dynamics_utils
 import dNdS_analysis.config
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
-all_transfers = pd.read_csv(dNdS_analysis.config.data_path / 'gut_microbiome_transfers.csv', index_col=0)
+all_transfers = dynamics_utils.load_detected_transfers()
 
 snv_folder_list = dNdS_analysis.config.snv_data_path.glob('*')
 for folder in snv_folder_list:

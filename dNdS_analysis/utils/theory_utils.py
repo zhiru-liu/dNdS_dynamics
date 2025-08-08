@@ -28,4 +28,31 @@ def compute_dNdS_rec_model(ds_clonal, fr, theta, dNdS_clonal, dNdS_rec):
     return dS, dNdS
 
 def dNdS_purify_curve(dS, fd, sbymu):
-    return (1-fd) + fd * (1-np.exp(-sbymu * dS)) / (sbymu * dS)
+    """
+    Purifying selection model for dN/dS ratio.
+    fd: fraction of deleterious mutations
+    sbymu: selection coefficient divided by mutation rate
+    dS: synonymous divergence
+    Returns the predicted dN/dS ratio.
+    """
+    return (1-fd) + fd * (1-np.exp(-sbymu * dS / 2)) / (sbymu * dS / 2)
+
+def dNdS_purify_curve_three_class(dS, alpha0, alpha1, sbymu1, sbymu2):
+    """
+    Three class DFE model: neutral, weakly deleterious, and strongly deleterious.
+    alpha0: neutral fraction
+    alpha1: weakly deleterious fraction
+    sbymu1: selection coefficient for weakly deleterious mutations
+    sbymu2: selection coefficient for strongly deleterious mutations
+    dS: synonymous divergence
+    Returns the predicted dN/dS ratio averaging over three classes.
+    """
+    alpha2 = 1 - alpha0 - alpha1
+    if alpha2 < 0:
+        raise ValueError("Invalid alpha values: alpha0 + alpha1 must be <= 1")
+    
+    weak_contri = (1-np.exp(-sbymu1 * dS / 2)) / (sbymu1 * dS / 2)
+    strong_contri = (1-np.exp(-sbymu2 * dS / 2)) / (sbymu2 * dS / 2)
+
+    total_result = alpha0 + alpha1 * weak_contri + alpha2 * strong_contri
+    return total_result

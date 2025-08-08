@@ -16,10 +16,10 @@ def computed_poisson_thinning(diffs, opportunities):
 
 
 def load_detected_transfers():
-    all_transfers = pd.read_csv(config.data_path / 'gut_microbiome_transfers.csv', index_col=0)
-    # make sure Sample 1 and Sample2 are strings
-    all_transfers['Sample 1'] = all_transfers['Sample 1'].astype(str)
-    all_transfers['Sample 2'] = all_transfers['Sample 2'].astype(str)
+    all_transfers = pd.read_csv(config.data_path / 'gut_microbiome_transfers.csv', index_col=0, 
+                            dtype={"Sample 1": "string", 
+                                   "Sample 2": "string",
+                                   "between clade?": "string"})
     return all_transfers
 
 

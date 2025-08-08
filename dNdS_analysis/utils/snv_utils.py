@@ -7,6 +7,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 
 import dNdS_analysis.config as config
+sys.path.append('/Users/Device6/Documents/Research/bgoodlab/UHGG/')
 import uhgg_helper.annotation_utils as annotation_utils
 
 def compute_biallelic_snvs(snvs, alleles, coverage):
