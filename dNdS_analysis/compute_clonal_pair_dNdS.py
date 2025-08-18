@@ -23,8 +23,8 @@ def compute_clonal_pair(species):
                'core_len_4D','core_len_1D',
                'core_diff_4D','core_diff_1D',
                # below are for the breakdown of 1D mutations
-               'core_n','core_m','core_nn',
-               'core_mut_n','core_mut_m','core_mut_nn']
+               'clonal_n','clonal_m','clonal_nn',
+               'clonal_mut_n','clonal_mut_m','clonal_mut_nn']
     results_df = pd.DataFrame(index=range(len(clonal_pairs)), columns=columns)
     results_df['species_name'] = species
 
@@ -49,9 +49,9 @@ def compute_clonal_pair(species):
 
         # only a subset of all polymorphisms are different between the two samples
         mut_types_1D = snv_helper.snv_types[(diff_sites & snv_helper.snv_1D)]
-        results_df.loc[i, ['core_mut_n', 'core_mut_m', 'core_mut_nn']] = [(mut_types_1D==x).sum() for x in ['n', 'm', 'nn']]
+        results_df.loc[i, ['clonal_mut_n', 'clonal_mut_m', 'clonal_mut_nn']] = [(mut_types_1D==x).sum() for x in ['n', 'm', 'nn']]
         # count the mutational opportunities for all covered core sites between the pair
-        results_df.loc[i, ['core_n', 'core_m', 'core_nn']] = snv_helper.mut_df.loc[(covered_mask & snv_helper.core_1D), ['n', 'm', 'nn']].sum().values
+        results_df.loc[i, ['clonal_n', 'clonal_m', 'clonal_nn']] = snv_helper.mut_df.loc[(covered_mask & snv_helper.core_1D), ['n', 'm', 'nn']].sum().values
         # snv_helper.compute_pair_dNdS(sample1, sample2, results_df, breakdown_df, i)
 
     return results_df

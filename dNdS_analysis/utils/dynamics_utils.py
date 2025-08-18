@@ -51,15 +51,32 @@ def load_dNdS_data():
         dnds_df = pd.read_csv(os.path.join(dnds_basepath, species_name + '.csv'))
         dnds_dfs.append(dnds_df)
     clonal_dnds_df = pd.concat(dnds_dfs)
-    clonal_dnds_df['clonal_diff_4D'] = clonal_dnds_df['core_diff_4D']
-    clonal_dnds_df['clonal_len_4D'] = clonal_dnds_df['core_len_4D']
-    clonal_dnds_df['clonal_diff_1D'] = clonal_dnds_df['core_diff_1D']
-    clonal_dnds_df['clonal_len_1D'] = clonal_dnds_df['core_len_1D']
+    clonal_dnds_df['clonal_diff_4D'] = clonal_dnds_df['core_diff_4D'].copy()
+    clonal_dnds_df['clonal_len_4D'] = clonal_dnds_df['core_len_4D'].copy()
+    clonal_dnds_df['clonal_diff_1D'] = clonal_dnds_df['core_diff_1D'].copy()
+    clonal_dnds_df['clonal_len_1D'] = clonal_dnds_df['core_len_1D'].copy()
 
     complete_df = pd.concat([full_dnds_df, clonal_dnds_df])
     complete_df = complete_df[~complete_df['species_name'].isin(config.blacklist_species)]
-    complete_df.set_index(['species_name', 'sample 1', 'sample 2'], inplace=True)
+    complete_df.set_index(['species_name', 'sample 1', 'sample 2'], inplace=True, )
     return complete_df
+
+
+def load_typical_pair_dNdS_data():
+    typical_pair_dnds_basepath = os.path.join(config.data_path, 'gut_microbiome_typical_pair_dNdS')
+    dnds_dfs = []
+    for file in os.listdir(typical_pair_dnds_basepath):
+        if file.startswith('.'):
+            continue
+        species_name = file.split('.')[0]
+        if species_name in config.blacklist_species:
+            # some species are blacklisted since recombination detection is not reliable
+            continue
+        dnds_df = pd.read_csv(os.path.join(typical_pair_dnds_basepath, species_name + '.csv'))
+        dnds_dfs.append(dnds_df)
+    typical_dnds_df = pd.concat(dnds_dfs)
+    typical_dnds_df.set_index(['species_name', 'sample 1', 'sample 2'], inplace=True)
+    return typical_dnds_df
 
 def find_clonal_pairs(snv_helper):
     """
