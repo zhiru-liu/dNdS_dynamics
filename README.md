@@ -22,6 +22,7 @@ The main analysis scripts are in the `dNdS_analysis` directory. The key scripts 
     - `dNdS_analysis/plotting_scripts/plot_dNdS_separation.py`: Figure 2 B-D
     - `dNdS_analysis/plotting_scripts/clonal_dNdS_dynamics.ipynb`: Figure 3, 4
     - `dNdS_analysis/plotting_scripts/clonal_snv_prevalence.ipynb`: Figure 5
+- Utilities for annotating mutation types (e.g., missense vs. nonsense) are imported from [zhiru-liu/uhgg-helper](https://github.com/zhiru-liu/uhgg-helper), though any preferred method can be used.
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
