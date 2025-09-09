@@ -24,8 +24,8 @@ import dNdS_analysis.config as config
 # print(clonal_dN / naive_clonal_dS)
 
 mpl.rcParams['font.size'] = 8
-fig, axes = plt.subplots(1, 3, figsize=(7, 2), dpi=300)
-plt.subplots_adjust(wspace=0.08)
+fig, axes = plt.subplots(1, 3, figsize=(7.5, 1.7), dpi=300)
+plt.subplots_adjust(wspace=0.15)
 
 complete_df = load_dNdS_data()
 
@@ -55,7 +55,7 @@ k = 10
 dsc_arr = np.logspace(-6, -3)
 fr_arr = logistic_accumulation(dsc_arr, ds_mid, k=k)
 dS_arr, dNdS_arr = compute_dNdS_rec_model(dsc_arr, fr_arr, theta, dNdS_c, dNdS_r)
-# axes[0].plot(dS_arr, dNdS_arr, linestyle='-', color='k', linewidth=0.5, label='recombination theory')
+axes[0].plot(dS_arr, dNdS_arr, linestyle='-', color='k', linewidth=0.5, label='recombination theory')
 
 for ax in axes:
     ax.set_ylim([1e-2, 1e1])
@@ -66,11 +66,11 @@ for ax in axes:
     ax.axhline(1, linewidth=0.5, linestyle='--', color='grey')
 
 axes[0].set_ylabel('$dN/dS$')
-axes[0].set_title('Full genome')
+axes[0].set_title('Full (core) genome')
 axes[1].set_title('Recombined regions')
 axes[2].set_title('Clonal regions')
 axes[1].set_yticklabels([])
 axes[2].set_yticklabels([])
 axes[0].legend()
-# fig.savefig(config.fig_path / 'dNdS.pdf', bbox_inches='tight')
-fig.savefig(config.fig_path / 'dNdS_no_curve.pdf', bbox_inches='tight')
+fig.savefig(config.fig_path / 'dNdS.pdf', bbox_inches='tight')
+# fig.savefig(config.fig_path / 'dNdS_no_curve.pdf', bbox_inches='tight')
