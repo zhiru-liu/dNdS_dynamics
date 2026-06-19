@@ -28,7 +28,9 @@ configurable in `dnds_dynamics/config.py` (env-overridable).
   access, consumption of CP-HMM recombination events, dN/dS stratification into
   clonal / recombined / full-core regions, and figure-reproduction utilities.
 - **`analysis/`** — data-preparation entry points: the NCBI isolate pipeline
-  (download → SNV table → CP-HMM recombination → dN/dS) and per-cohort prep.
+  (download → SNV table → CP-HMM recombination → dN/dS) and per-cohort prep. See
+  [`analysis/README.md`](analysis/README.md) for the isolate pipeline, including
+  how cultured isolates are distinguished from MAGs.
 - **`paper_figures/`** — scripts that produce the manuscript figures (main text
   and supplement). See [`paper_figures/README.md`](paper_figures/README.md) for a
   table mapping each figure to its generating script.
