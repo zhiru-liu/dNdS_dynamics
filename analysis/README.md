@@ -128,9 +128,12 @@ the metagenome data. Everything downstream (annotation, SNV table, recombination
 dN/dS) is purely coordinate-based, so you can align to **any** reference:
 
 ```bash
-python analysis/build_isolate_snv_table.py --midas-species My_species \
+python analysis/build_isolate_snv_table.py --species My_species \
     --ref-fna ref.fna --ref-gff ref.gff --core-gene-source none
 ```
+
+(`--species` is just a label for the outputs; with a MIDAS reference you instead
+pass `--midas-species`, which doubles as that label.)
 
 Two things to keep in mind:
 

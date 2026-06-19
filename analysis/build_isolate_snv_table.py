@@ -38,7 +38,7 @@ Examples:
   python build_isolate_snv_table.py --midas-species Alistipes_putredinis_61533
   python build_isolate_snv_table.py --midas-species Bacteroides_vulgatus_57955
   # Arbitrary reference (FASTA + GFF), no QP/MIDAS core
-  python build_isolate_snv_table.py --midas-species My_species \\
+  python build_isolate_snv_table.py --species My_species \\
       --ref-fna ref.fna --ref-gff ref.gff --core-gene-source none
 """
 
@@ -87,28 +87,31 @@ def _default_isolate_dir(midas_species: str) -> str:
     return "_".join(parts)
 
 
-def configure_paths(midas_species: str, isolate_dir: str | None = None,
-                    out_dir: Path | None = None,
+def configure_paths(species: str, midas_species: str | None = None,
+                    isolate_dir: str | None = None, out_dir: Path | None = None,
                     ref_fna: Path | None = None, ref_gff: Path | None = None) -> None:
-    """Set module-level path globals for a given species (read by worker fns).
+    """Set module-level path globals (read by worker fns).
 
-    By default the reference is the MIDAS rep genome for ``midas_species``.
-    Pass ``ref_fna`` + ``ref_gff`` to build against an arbitrary reference
-    (e.g. a UHGG reference ``reference_genomes/<MGYG>.fna`` + ``genes/<MGYG>.gff``)
-    so the table is coordinate-compatible with an existing catalog.
+    ``species`` is the label/slug for outputs and the default isolate download
+    directory. The alignment reference is either an explicit ``ref_fna`` +
+    ``ref_gff`` (any genome + annotation), or — if those are omitted — the MIDAS
+    rep genome for ``midas_species`` (then required), the reference the metagenome
+    catalog was called against.
     """
     global SPECIES, REF_FNA_GZ, REF_FEATURES_GZ, REF_ANNOTATION_FORMAT
     global ISOLATE_ROOT, MANIFEST, FASTA_DIR, DEFAULT_OUT_DIR
-    SPECIES = midas_species
+    SPECIES = species
     if ref_fna is not None:
         REF_FNA_GZ = Path(ref_fna)
         REF_FEATURES_GZ = Path(ref_gff)
         REF_ANNOTATION_FORMAT = "gff"
     else:
+        if not midas_species:
+            raise ValueError("midas_species is required when ref_fna/ref_gff are not given")
         REF_FNA_GZ = REP_GENOME_ROOT / midas_species / "genome.fna.gz"
         REF_FEATURES_GZ = REP_GENOME_ROOT / midas_species / "genome.features.gz"
         REF_ANNOTATION_FORMAT = "features"
-    ISOLATE_ROOT = NCBI_ROOT / (isolate_dir or _default_isolate_dir(midas_species))
+    ISOLATE_ROOT = NCBI_ROOT / (isolate_dir or _default_isolate_dir(species))
     MANIFEST = ISOLATE_ROOT / "manifest_all_isolates.tsv"
     FASTA_DIR = ISOLATE_ROOT / "fasta"
     DEFAULT_OUT_DIR = out_dir or (ISOLATE_ROOT / "snv_table")
@@ -535,8 +538,12 @@ def write_core_genes_from_qp(mut_df: pd.DataFrame, species: str, qp_catalog_dir:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--midas-species", default="Alistipes_putredinis_61533",
-                        help="MIDAS rep-genome species id (reference + features source).")
+    parser.add_argument("--species", default=None,
+                        help="Species label/slug for outputs and the default isolate dir. "
+                             "Defaults to --midas-species; required when using --ref-fna.")
+    parser.add_argument("--midas-species", default=None,
+                        help="MIDAS rep-genome id; used as the alignment reference when "
+                             "--ref-fna is not given (and as the default species label).")
     parser.add_argument("--isolate-dir", default=None,
                         help="NCBI download subdir under /Volumes/Botein/ncbi_isolates "
                              "(default: midas-species with numeric id stripped).")
@@ -560,7 +567,13 @@ def main():
 
     if (args.ref_fna is None) != (args.ref_gff is None):
         raise SystemExit("--ref-fna and --ref-gff must be given together.")
-    configure_paths(args.midas_species, args.isolate_dir, args.out_dir,
+    if args.ref_fna is None and not args.midas_species:
+        raise SystemExit("need a reference: pass --midas-species (MIDAS rep genome), "
+                         "or --ref-fna + --ref-gff for any other reference.")
+    species = args.species or args.midas_species
+    if not species:
+        raise SystemExit("provide --species (the label) when using --ref-fna.")
+    configure_paths(species, args.midas_species, args.isolate_dir, args.out_dir,
                     ref_fna=args.ref_fna, ref_gff=args.ref_gff)
     out_dir = args.out_dir or DEFAULT_OUT_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -661,10 +674,14 @@ def main():
           f"{mut_df['Site Type'].value_counts().to_dict()}")
 
     # Core genes are reference- and annotation-dependent (see --core-gene-source).
-    # 'qp' reuses the MIDAS/QP core (same reference), which excludes type-strain
-    # accessory content most isolates lack, otherwise inflating coverage gaps.
+    # 'qp' reuses the MIDAS/QP core (same reference, keyed by the MIDAS id), which
+    # excludes type-strain accessory content most isolates lack, otherwise
+    # inflating coverage gaps.
     if args.core_gene_source == "qp":
-        write_core_genes_from_qp(mut_df, SPECIES, args.qp_catalog_dir, args.out_dir)
+        if not args.midas_species:
+            raise SystemExit("--core-gene-source qp needs --midas-species (the QP catalog key); "
+                             "use --core-gene-source none for a non-MIDAS reference.")
+        write_core_genes_from_qp(mut_df, args.midas_species, args.qp_catalog_dir, args.out_dir)
     else:
         print("[core_genes] --core-gene-source none: not writing core_genes.json. "
               "Supply it yourself (list of Gene Name values from site_annotations) "
