@@ -1,0 +1,53 @@
+# ---- Local-only (not for publication) ----
+# Internal tracking docs and the agent project-context file; kept on disk for
+# local use, excluded from the published main branch.
+/notes/
+/CLAUDE.md
+# Top-level scratch / superseded notebooks (figure code lives in paper_figures/*.py).
+/*.ipynb
+
+# ---- Byte-compiled / caches ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.cache/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+
+# ---- OS / editor cruft ----
+.DS_Store
+*.swp
+
+# ---- Environments ----
+.env
+.venv
+env/
+venv/
+ENV/
+
+# ---- Large / regenerable analysis artifacts ----
+# Outputs and figures are regenerable from scripts; large source data lives on
+# /Volumes/Botein. Curated, paper-bound subsets are re-added explicitly later
+# (e.g. data/figure_data, figs/) with `git add -f`.
+# Anchored to repo root so they don't also ignore the dnds_dynamics/figures/
+# package or any nested outputs/ dirs.
+/outputs/
+/figures/
+/tmp_batch_dry_runs/
+
+# Published Liu&Good 2024 supplementary transfers table (44 MB) — kept locally,
+# downloadable from the paper (pbio.3002472.s003) / LiuGood-2024-SNVs Zenodo.
+data/gut_microbiome_transfers.csv
+
+# Big binary / data formats (re-add specific curated files with `git add -f`)
+*.parquet
+*.feather
+*.npy
+*.npz
+*.pickle
+*.pkl
+*.fna
+*.fna.gz
+*.delta

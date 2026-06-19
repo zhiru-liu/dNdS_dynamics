@@ -1,0 +1,2 @@
+species_name,sample 1,sample 2,core_diff,core_len,core_len_4D,core_len_1D,core_diff_4D,core_diff_1D,clonal_n,clonal_m,clonal_nn,clonal_mut_n,clonal_mut_m,clonal_mut_nn
+Oscillibacter_sp_60799,700103558,700106412,5,943803,164520,622692,2,1,62388,1801827,3861,0,1,0

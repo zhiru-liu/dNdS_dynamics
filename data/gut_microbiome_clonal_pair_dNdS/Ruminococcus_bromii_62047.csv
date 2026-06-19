@@ -1,0 +1,2 @@
+species_name,sample 1,sample 2,core_diff,core_len,core_len_4D,core_len_1D,core_diff_4D,core_diff_1D,clonal_n,clonal_m,clonal_nn,clonal_mut_n,clonal_mut_m,clonal_mut_nn
+Ruminococcus_bromii_62047,700015181,700024086,64,1356069,187135,908770,9,44,120812,2600644,4854,1,43,0
