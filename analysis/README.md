@@ -119,3 +119,32 @@ python analysis/compute_stratified_isolate_dnds.py  ...
 
 The resulting SNV tables share their coordinate system and site-type annotations
 with the metagenome (QP) catalogs, so downstream dN/dS code is identical for both.
+
+### Moving beyond the MIDAS reference
+
+The default reference is the MIDAS rep genome, because that is what the metagenome
+(QP) catalogs were called against — needed only if you want to compare isolates to
+the metagenome data. Everything downstream (annotation, SNV table, recombination,
+dN/dS) is purely coordinate-based, so you can align to **any** reference:
+
+```bash
+python analysis/build_isolate_snv_table.py --midas-species My_species \
+    --ref-fna ref.fna --ref-gff ref.gff --core-gene-source none
+```
+
+Two things to keep in mind:
+
+- **Reference + gene annotation are now yours to choose** (`--ref-fna` + `--ref-gff`).
+  Site degeneracy (1D/4D) and mutation effects are read straight from the GFF's
+  CDS features, so a complete, correct annotation matters.
+- **"Core genes" become reference-dependent.** The default (`--core-gene-source qp`)
+  defines core genes by reusing the MIDAS/QP catalog, which exists only for MIDAS
+  references. With a new reference, pass `--core-gene-source none` and supply your
+  own `core_genes.json` in the table directory (a JSON list of `Gene Name` values
+  from `site_annotations.parquet`) — e.g. genes present across most of your isolate
+  panel, or the reference's core/pangenome set. `run_isolate_cphmm.py` reads that
+  file to restrict recombination detection to core genes.
+
+The metagenome (QP) side cannot be re-referenced here: those catalogs were
+genotyped against MIDAS upstream (Garud & Good 2019), so a different reference for
+the metagenomes would require re-running that SNV-calling pipeline.

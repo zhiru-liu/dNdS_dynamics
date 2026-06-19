@@ -13,18 +13,33 @@ table contract:
 - ``site_annotations.parquet``: site type / gene / mutation type per position
 - ``metadata.json``: provenance + alignment parameters
 
-Reference genomes: ``<rep-genome-root>/<midas-species>/genome.fna.gz`` and
-``genome.features.gz`` (MIDAS db, same reference the LiuGood2024 metagenome
-catalog uses). Isolate FASTAs: ``<ncbi-root>/<isolate-dir>/fasta/*.fna.gz``.
+Reference choice (the alignment target). By default the reference is the MIDAS
+rep genome for ``--midas-species`` (``<rep-genome-root>/<midas-species>/
+genome.fna.gz`` + ``genome.features.gz``), which is the same reference the
+LiuGood2024 metagenome catalog was called against — required if you want to
+compare isolates to the metagenome (QP) data. To use **any other reference**,
+pass ``--ref-fna`` + ``--ref-gff`` (FASTA + GFF); everything downstream
+(annotation, SNV table, recombination, dN/dS) is coordinate-based and works with
+any reference, so only the alignment target and the gene annotation change.
+Isolate FASTAs: ``<ncbi-root>/<isolate-dir>/fasta/*.fna.gz``.
 
-This is the single isolate SNV-table builder for all species; select the species
-with ``--midas-species`` (e.g. A. putredinis and P. vulgatus for this revision).
+Core genes (``--core-gene-source``). Site-type/dN/dS work on the whole reference,
+but recombination detection restricts to *core* genes. "Core" is reference- and
+annotation-dependent: with ``qp`` (default) a gene is core if its reference sites
+appear in the matching MIDAS/QP catalog — which only exists for MIDAS references.
+For a non-MIDAS reference there is no QP catalog, so use ``--core-gene-source none``
+and supply ``core_genes.json`` yourself (e.g. genes present across your isolate
+panel, or from the reference's pangenome); see analysis/README.md.
+
+This is the single isolate SNV-table builder for all species.
 
 Examples:
-  # A. putredinis
+  # MIDAS reference (comparable to the metagenome catalog)
   python build_isolate_snv_table.py --midas-species Alistipes_putredinis_61533
-  # P. vulgatus (formerly Bacteroides vulgatus)
   python build_isolate_snv_table.py --midas-species Bacteroides_vulgatus_57955
+  # Arbitrary reference (FASTA + GFF), no QP/MIDAS core
+  python build_isolate_snv_table.py --midas-species My_species \\
+      --ref-fna ref.fna --ref-gff ref.gff --core-gene-source none
 """
 
 from __future__ import annotations
@@ -535,7 +550,12 @@ def main():
     parser.add_argument("--max-isolates", type=int, default=0, help="0 = all")
     parser.add_argument("--qp-catalog-dir", type=Path,
                         default=Path("/Volumes/Botein/GarudGood2019_snvs/snvs_feather"),
-                        help="QP catalog dir; its coverage table defines the reused MIDAS core genes.")
+                        help="QP catalog dir; its coverage table defines the reused MIDAS core genes "
+                             "(only used when --core-gene-source qp).")
+    parser.add_argument("--core-gene-source", choices=("qp", "none"), default="qp",
+                        help="How to define core_genes.json (reference-dependent): 'qp' reuses the "
+                             "MIDAS/QP catalog core (default; MIDAS references only); 'none' skips it "
+                             "(supply core_genes.json yourself for a non-MIDAS reference).")
     args = parser.parse_args()
 
     if (args.ref_fna is None) != (args.ref_gff is None):
@@ -640,9 +660,15 @@ def main():
     print(f"site_annotations: {mut_df.shape}; site type counts: "
           f"{mut_df['Site Type'].value_counts().to_dict()}")
 
-    # Core genes = the QP/MIDAS core (reused; same reference). Excludes type-strain
-    # accessory content most isolates lack, which otherwise inflates coverage gaps.
-    write_core_genes_from_qp(mut_df, SPECIES, args.qp_catalog_dir, args.out_dir)
+    # Core genes are reference- and annotation-dependent (see --core-gene-source).
+    # 'qp' reuses the MIDAS/QP core (same reference), which excludes type-strain
+    # accessory content most isolates lack, otherwise inflating coverage gaps.
+    if args.core_gene_source == "qp":
+        write_core_genes_from_qp(mut_df, SPECIES, args.qp_catalog_dir, args.out_dir)
+    else:
+        print("[core_genes] --core-gene-source none: not writing core_genes.json. "
+              "Supply it yourself (list of Gene Name values from site_annotations) "
+              "before running recombination on a non-MIDAS reference.")
 
     metadata = {
         "species": SPECIES,
