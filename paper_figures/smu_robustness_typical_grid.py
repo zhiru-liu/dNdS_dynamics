@@ -21,7 +21,7 @@ This script takes the clonal points exactly as in the paper, then scans a grid o
 artificial (typical dN/dS, typical dS) values, setting fd = 1 - typical_dNdS in
 each cell, and reports the refit s/mu.  Two panels:
 
-  Panel A ("alpha0 only", faithful to the paper):
+  Panel A ("alpha0 only", as in the paper):
       fit s/mu to the clonal bins alone.  s/mu depends only on typical dN/dS
       (the typical-dS axis is flat by construction) -- this *is* the robustness
       statement.
@@ -76,7 +76,7 @@ TYP_DS_GRID   = np.geomspace(1e-3, 1e-1, N_GRID)       # typical (recombined) dS
 
 
 # --------------------------------------------------------------------------
-# Helpers (copied verbatim in spirit from the paper script)
+# Helpers
 # --------------------------------------------------------------------------
 def safe_div(num, den):
     num = np.asarray(num, dtype=float)
@@ -203,7 +203,7 @@ print(f"Across-species dN/dS range: {dnds_box_lo:.3f} - {dnds_box_hi:.3f} "
 # --------------------------------------------------------------------------
 # Scan the grid
 # --------------------------------------------------------------------------
-smu_A = np.full((N_GRID, N_GRID), np.nan)  # alpha0-only (faithful)
+smu_A = np.full((N_GRID, N_GRID), np.nan)  # alpha0-only (as in the paper)
 smu_B = np.full((N_GRID, N_GRID), np.nan)  # + typical anchor point
 
 for i, typ_dnds in enumerate(TYP_DNDS_GRID):

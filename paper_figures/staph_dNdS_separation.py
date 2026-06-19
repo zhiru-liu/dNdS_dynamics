@@ -1,10 +1,8 @@
 """Supplementary figure: S. aureus dN/dS separation (Full / Recombined / Clonal).
 
-Faithful port of the figure-producing cells of
-dNdS_dynamics/exploratory/2023-10-28_staph/dNdS_analysis.ipynb (-> Staph_dNdS.pdf).
 The isolate analog of Fig 2: three panels of dN/dS vs full-genome dS for S. aureus
 isolate pairs, with recombination masked HEURISTICALLY from hardcoded ST-lineage
-event coordinates (eyeballed from SNP-density plots in the source notebook).
+event coordinates (eyeballed from SNP-density plots).
 
 Data (large; not vendored) lives in config.STAPH_DATA_DIR:
   variants.npy (site types), Saureus.fasta (MSA), div_mat.npy, cf_mat.npy.
@@ -42,8 +40,8 @@ div_mat = np.load(base_dir / "div_mat.npy")
 clonal_frac_mat = np.load(base_dir / "cf_mat.npy")
 
 # --- select close (cf>0.5) and typical (cf<0.5, 500 sampled) pairs ---
-# NOTE: the source notebook left random.sample unseeded; seed here so the script
-# is reproducible. The figure is statistical, so this does not change conclusions.
+# Seed for reproducibility. The figure is statistical, so this does not change
+# conclusions.
 random.seed(0)
 idxs = np.where(clonal_frac_mat > 0.5)
 close_pairs = [(int(a), int(b)) for a, b in zip(idxs[0], idxs[1]) if a < b]
@@ -53,7 +51,7 @@ typical_pairs = random.sample(typical_pairs, 500)
 
 species_name = "Staph"
 
-# --- heuristic per-ST-lineage recombination masks (eyeballed in source notebook) ---
+# --- heuristic per-ST-lineage recombination masks (eyeballed from SNP density) ---
 ST34 = ["C1129", "C1115", "C1102", "C1100", "C1090", "C1122"]
 ST582 = ["C1142", "C1158"]
 ST239 = ["C9669"]

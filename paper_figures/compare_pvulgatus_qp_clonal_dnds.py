@@ -1,4 +1,4 @@
-"""Compare isolate P. vulgatus vs old QP B. vulgatus dN/dS dynamics.
+"""Compare isolate P. vulgatus vs QP B. vulgatus dN/dS dynamics.
 
 Same species, same MIDAS reference (Bacteroides_vulgatus_57955), two datasets:
   - QP: LiuGood2024 metagenome quasi-phased SNVs (published close/clonal CSVs).
@@ -260,8 +260,8 @@ def fit_purify_sbymu(agg: pd.DataFrame, fd: float,
                      min_pairs: int = 20) -> float:
     """WLS fit of the single-class purifying s/mu on a binned aggregate.
 
-    Mirrors ``fit_sbymu_wls`` from the published clonal-dN/dS notebook: minimize
-    the inverse-variance-weighted mean squared log-residual between the binned
+    Same WLS objective as the main clonal-dN/dS fit: minimize the
+    inverse-variance-weighted mean squared log-residual between the binned
     ratio-of-totals ``R_hat`` and ``dNdS_purify_curve(dS_x, fd, s/mu)``. ``fd`` is
     fixed per class (from the high-dS / typical-pair equilibrium). Returns NaN if
     fewer than 3 informative bins.
@@ -285,8 +285,8 @@ def fit_purify_sbymu(agg: pd.DataFrame, fd: float,
     return float(minimize_scalar(objective, bounds=bounds, method="bounded").x)
 
 
-# --- 2-class ("three-class": neutral + weak + strong) purifying model, ported from
-#     the published nonsense grid (clonal_dNdS_dynamics.py). ---
+# --- 2-class ("three-class": neutral + weak + strong) purifying model, as in the
+#     nonsense grid (clonal_dNdS_dynamics.py). ---
 TWO_CLASS_S2_BYMU = 1e7      # fixed "very strong" class
 TWO_CLASS_DS_THRESH = 3e-5   # early-regime cutoff used to estimate alpha2
 

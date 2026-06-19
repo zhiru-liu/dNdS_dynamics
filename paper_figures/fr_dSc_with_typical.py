@@ -11,8 +11,6 @@ Produces ONE composite figure (recombination_dynamics_fit_with_fr.pdf):
               across the row, so the rare low-f_r pairs are visibly the low-dS /
               dN/dS~1 left end of the decay -- which is why f_r(dS_c) must pass
               through them rather than threading the overwhelming bulk.
-
-See notes/fr_dSc_typical_pairs_dnds_decay.md.
 """
 import sys
 from pathlib import Path

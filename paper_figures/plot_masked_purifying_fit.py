@@ -1,10 +1,10 @@
 """Refit the clonal-dN/dS purifying model with dense-window (missed-recombination)
 SNVs masked, and remake the two publication figures.
 
-Reproduces the original fit (Poisson-thin 4D into x/denominator; 15 geomspace
-bins; ratio-of-totals R_hat per bin; WLS fit of s/mu with fd=0.9 fixed; reference
-curves s/mu=1e5,1e3; unrelated-pair species means; detection shading dS>1e-3),
-from dNdS_dynamics/plotting_scripts/clonal_dNdS_dynamics.ipynb.
+Uses the same fit as the main clonal-dN/dS figure (Poisson-thin 4D into
+x/denominator; 15 geomspace bins; ratio-of-totals R_hat per bin; WLS fit of s/mu
+with fd=0.9 fixed; reference curves s/mu=1e5,1e3; unrelated-pair species means;
+detection shading dS>1e-3).
 
 Variants compared:
   - no-Ap, unmasked      (reproduces published s/mu ~ 1.1e4)
@@ -340,7 +340,7 @@ def _plot_grid(df, sb):
     import matplotlib.pyplot as plt
     from matplotlib.patches import Patch
 
-    # palette matching the original (figure_utils / notebook COLORS)
+    # palette matching the main figure (figure_utils COLORS)
     C_CLOUD = "#AECDE1"; C_TREND = "#0072B2"; C_NOMASK = "#9e9e9e"
     C_FIT = "tab:orange"; C_SPECIES = "#009E73"; C_NEUTRAL = "#6E6E6E"; C_SHADE = "#AAAAAA"
     XLIM = (1e-6, 1e-1); YLIM = (0.03, 20.0)
@@ -355,7 +355,7 @@ def _plot_grid(df, sb):
     yfit = dNdS_purify_curve(grid, FD_FIXED, sb)
     unrel = species_unrelated_means().set_index("species")
 
-    # Original per-species binning settings (notebook cell 23).
+    # Per-species binning settings (match the main figure).
     settings = psd.ThinSettings(auto_bins=True, target_pairs_per_bin=50, min_pairs_per_bin=20,
                                 min_bins=4, min_bins_retained=3, min_pairs_per_species=10)
 

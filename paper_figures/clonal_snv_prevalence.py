@@ -1,8 +1,6 @@
 """Figure 5: prevalence of clonal SNVs (B. vulgatus detail + per-species grid).
 
-Script conversion of dNdS_dynamics/.../plotting_scripts/clonal_snv_prevalence.ipynb
-(kept as reference). Imports/paths rewired to this repo's package; figure logic
-verbatim. Loads raw QP SNV catalogs per species via dnds_dynamics.snv_helpers.qp
+Loads raw QP SNV catalogs per species via dnds_dynamics.snv_helpers.qp
 (load_qp_snv_helper / QPSNVHelper).
 Outputs (to config.fig_path): Bv_pnps_by_freq.pdf, clonal_snv_prevalence_grid.pdf,
 and per-species <species>_clonal_samples_clustermap.pdf.
@@ -380,11 +378,9 @@ sns.set_style("white")
 
 
 def _prep_one_species(stats):
-    """RECONSTRUCTED helper (missing from the source notebook -- it lived in the
-    kernel from a deleted cell). Generalizes the verified Bv single-species
-    pipeline (label_sites -> counts_and_prop -> poisson_prop_err) to any species'
-    compute_snv_stats() tuple, returning the per-prevalence-bin proportions and
-    Poisson error bars the grid expects.
+    """Generalize the Bv single-species pipeline (label_sites -> counts_and_prop
+    -> poisson_prop_err) to any species' compute_snv_stats() tuple, returning the
+    per-prevalence-bin proportions and Poisson error bars the grid expects.
     """
     (num_alt_all_1D, num_alt_all_4D, num_covered_all_1D, num_covered_all_4D,
      num_alt_1D, num_alt_4D, num_covered_1D, num_covered_4D, L1d, L4d) = stats

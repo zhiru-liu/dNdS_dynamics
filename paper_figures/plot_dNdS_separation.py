@@ -1,8 +1,7 @@
 """Figure 2 B-D: dN/dS vs full-genome dS, separated into full / recombined / clonal.
 
-Faithful port of dNdS_dynamics/dNdS_analysis/plotting_scripts/plot_dNdS_separation.py.
-Only the imports/bootstrap are rewired to this repo's package; the figure logic is
-unchanged. Writes ``config.fig_path / 'dNdS.pdf'``.
+Each point is a pair of closely related strains; dN/dS is estimated from 1D and 4D
+sites and bootstrapped. Writes ``config.fig_path / 'dNdS.pdf'``.
 """
 import os
 import sys

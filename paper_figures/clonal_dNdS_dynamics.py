@@ -1,13 +1,9 @@
 """Figures 3 & 4 (MAIN TEXT): clonal-region dN/dS dynamics.
 
-Main-text version: uses ALL species, INCLUDING the Alistipes putredinis outlier
-(hence missense s/mu ~5e3). The A.-putredinis-excluded variant (a supplementary
-figure illustrating Ap's outlier effect) reuses this code but lives in a
-separate script grouped with the revision's Ap investigations -- see the note
-in CLAUDE.md.
+Uses all species, including the Alistipes putredinis outlier (hence missense
+s/mu ~5e3). The A.-putredinis-excluded variant (a supplementary figure
+illustrating Ap's outlier effect) reuses this code with the Ap filter re-enabled.
 
-Script conversion of dNdS_dynamics/.../plotting_scripts/clonal_dNdS_dynamics.ipynb
-(kept as reference). Imports rewired to this repo's package; figure logic verbatim.
 Outputs (to config.fig_path): clonal_dNdS_missense_nonsense_panels_with_fits.pdf,
 purify_three_class_scan.pdf, clonal_dNdS_species_grid_{all,nonsense,missense}.pdf
 """
@@ -429,7 +425,6 @@ ax.legend(handles, labels, frameon=True, loc="upper right", ncol=1, handlelength
 
 plt.tight_layout()
 # Main-text single-panel aggregate clonal dN/dS purifying fit (both classes combined).
-# Savefig was commented in the source notebook; enabled here so the script emits it.
 plt.savefig(config.fig_path / "clonal_dNdS_purifying_fit.pdf", dpi=600, bbox_inches='tight')
 
 # ===== cell 12 =====

@@ -1,14 +1,10 @@
-"""Plot a stratified dN/dS separation grid for a fixed set of isolate runs.
+"""Stratified dN/dS separation grid for the isolate CP-HMM runs (Ap + Pv).
 
-Like ``plot_isolate_stratified_dnds_grid.py``, but instead of discovering point
-files by globbing a UHGG table root, this takes explicit ``LABEL=points.csv``
-pairs. Used to assemble the figure for the Ap / Pv isolate CP-HMM runs whose
-recombination caches live under ``outputs/<run>/cache/snv_table/`` (so they all
-share the accession name ``snv_table`` and cannot be told apart by glob).
-
-The layout mirrors ``gut_microbiome_stratified_dnds_grid``: an aggregate row
-across all supplied species followed by one row per species, columns being the
-full-core / recombined / clonal strata.
+Takes explicit ``LABEL=points.csv`` pairs (one per species) — needed because the
+Ap and Pv runs both use the accession name ``snv_table`` and so cannot be told
+apart by globbing. The layout is an aggregate row across all supplied species
+followed by one row per species, with columns being the full-core / recombined /
+clonal strata.
 """
 
 from __future__ import annotations
