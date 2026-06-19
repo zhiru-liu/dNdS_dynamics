@@ -1,0 +1,16 @@
+# Python 3.10. Install with:  pip install -r requirements.txt
+numpy
+pandas
+scipy
+biopython
+matplotlib
+seaborn
+statsmodels
+
+# Recombination detection is provided by the companion `cphmm` package, installed
+# editable from its repository:
+#   git clone https://github.com/zhiru-liu/close_pair_hmm
+#   pip install -e close_pair_hmm
+#
+# Building isolate SNV tables additionally requires MUMmer 4 (nucmer) on PATH:
+#   https://github.com/mummer4/mummer

@@ -36,10 +36,12 @@ configurable in `dnds_dynamics/config.py` (env-overridable).
 
 ## Dependencies
 
-Python 3.10 (pandas, numpy, biopython). Recombination detection uses the
-companion [`cphmm`](https://github.com/zhiru-liu/close_pair_hmm) package
-(installed editable); isolate SNV tables are built with
-[MUMmer 4](https://github.com/mummer4/mummer).
+Python 3.10; install the Python dependencies with `pip install -r
+requirements.txt` (numpy, pandas, scipy, biopython, matplotlib, seaborn,
+statsmodels). Recombination detection uses the companion
+[`cphmm`](https://github.com/zhiru-liu/close_pair_hmm) package (installed
+editable), and isolate SNV tables are built with
+[MUMmer 4](https://github.com/mummer4/mummer); see `requirements.txt` for both.
 
 ## License
 
