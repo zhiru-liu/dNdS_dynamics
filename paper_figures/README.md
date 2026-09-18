@@ -3,8 +3,7 @@
 Every script that produces a figure in the manuscript lives here. Each reads the
 vendored input tables in `data/` (plus, for a few figures, the external public
 data listed below) and writes to `figures/` (`config.fig_path`) using the same
-file name as the published figure. The one exception is the forward-time
-simulation (Fig R), a self-contained package in `forward_time_simulations/`. The figures as they appear in the paper are
+file name as the published figure. The figures as they appear in the paper are
 kept in [`figs/`](figs/). The tables below map each figure to its file, the
 script that produces it, and the data it is drawn from.
 
@@ -21,6 +20,7 @@ Per-pair tables vendored in `data/`:
 | `pvulgatus_vs_qp/qp_sample_div_to_ref.csv` | Clade (vulgatus / dorei) of each QP *P. vulgatus* sample from its 4D divergence to the reference | `compare_pvulgatus_qp_clonal_dnds.py` |
 | `identical_fraction/<species>.csv` | Between-host identical-fraction matrices (fraction of 1,000-site 4D blocks with no differences) for the species in Figs 5 and Q | Liu & Good 2024 |
 | `Bv_clades.txt`, `QP_samples.csv` | *P. vulgatus* clade labels; QP sample list | Liu & Good 2024 |
+| `forward_time_simulations/simulation_output_*.txt.gz` | Raw output of the forward-time simulations (Fig R): sampled individuals per replicate and time point with their fitness and the frequencies of their synonymous and nonsynonymous mutations, for four recombination rates and up to 11 population sizes (file name = `<s>_<Ns>_<NU>_<NR>_<l/L>`) | `paper_figures/forward_time_simulations/run_simulation.py` driving the C++ simulator in the same directory |
 
 External public data needed by some figures:
 
@@ -82,4 +82,4 @@ External public data needed by some figures:
 | O | [clonal_dNdS_species_grid_missense.pdf](figs/clonal_dNdS_species_grid_missense.pdf) | `clonal_dNdS_dynamics.py` | `gut_microbiome_*_pair_dNdS/` | |
 | P | [clonal_dNdS_species_grid_nonsense.pdf](figs/clonal_dNdS_species_grid_nonsense.pdf) | `clonal_dNdS_dynamics.py` | `gut_microbiome_*_pair_dNdS/` | |
 | Q | [clonal_snv_prevalence_grid.pdf](figs/clonal_snv_prevalence_grid.pdf) | `clonal_snv_prevalence.py` | as Fig 5 (all species) | |
-| R | [forward_time_simulations.pdf](figs/forward_time_simulations.pdf) | `forward_time_simulations/plot_forward_time_simulation_results.py` | simulation outputs written by `forward_time_simulations/run_simulation.py` (not vendored) | Individual-based simulator in the same directory (`main.cpp` + headers). From that directory: `g++ -O3 -std=c++11 -o simulation main.cpp`, then `python run_simulation.py` (runs the simulator and writes `simulation_output_*.txt.gz`), then the plot script, which writes `forward_time_simulations.pdf` there. |
+| R | [forward_time_simulations.pdf](figs/forward_time_simulations.pdf) | `forward_time_simulations/plot_forward_time_simulation_results.py` | `forward_time_simulations/` | Plots every complete run per recombination rate from the vendored outputs. To regenerate the outputs themselves: in `forward_time_simulations/`, `g++ -O3 -std=c++11 -o simulation main.cpp`, then `python run_simulation.py` (writes `simulation_output_*.txt.gz` there; point the plot script at them with `DNDS_SIM_DIR`). |

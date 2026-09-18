@@ -91,7 +91,7 @@ Ns = full_Ns
 
 full_rbymus = [0,rbymu, rbymu*10, rbymu*30] # recombination rates to use
 rbymus = full_rbymus
-rbymus = [full_rbymus[2]] # debug
+#rbymus = [full_rbymus[2]] # debug (single recombination rate)
 
 # Function that calculates the scaled parameters (NS,NU,NR) from known empirical constraints and simulated values of sd and N
 def calculate_scaled_parameters(sd,N,sbymu=sbymu, rbymu=rbymu, lbyL=lbyL, fd=fd, L=L):
@@ -106,12 +106,15 @@ def calculate_scaled_parameters(sd,N,sbymu=sbymu, rbymu=rbymu, lbyL=lbyL, fd=fd,
 	
 	return (NS, NU, NR)
 
-def parse_simulation_output(sd,NS,NU,NR,lbyL):
+def output_filename(sd,NS,NU,NR,lbyL):
+	return "simulation_output_%g_%g_%g_%g_%g.txt.gz" % (sd,NS,NU,NR,lbyL)
+
+def parse_simulation_output(sd,NS,NU,NR,lbyL,directory="."):
 
 	simulation_output = []
 	current_replicate = []
 	
-	file = gzip.open("simulation_output_%g_%g_%g_%g_%g.txt.gz" % (sd,NS,NU,NR,lbyL), mode='rt')
+	file = gzip.open(os.path.join(directory, output_filename(sd,NS,NU,NR,lbyL)), mode='rt')
 	
 	file.readline() # header
 	for line in file:

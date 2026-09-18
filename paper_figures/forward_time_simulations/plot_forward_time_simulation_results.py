@@ -15,13 +15,35 @@ mpl.rcParams['lines.linewidth'] = 0.5
 mpl.rcParams['legend.frameon']  = False
 mpl.rcParams['legend.fontsize']  = 'small'
 
+import os
+from pathlib import Path
 import run_simulation
+
+# Simulation outputs (vendored under data/) and the figure output dir; both overridable.
+REPO = Path(__file__).resolve().parents[2]
+SIM_DIR = Path(os.environ.get("DNDS_SIM_DIR", REPO / "data" / "forward_time_simulations"))
+FIG_DIR = Path(os.environ.get("DNDS_FIG_DIR", REPO / "figures"))
 
 #sd = 1e-02 #run_simulation.sd
 sbymus = [5e03]
 rbymus = run_simulation.full_rbymus
-Nss = [run_simulation.full_Ns[0:8],run_simulation.full_Ns,run_simulation.full_Ns[0:4],run_simulation.full_Ns[0:5]] 
 sd = 1e-02
+
+
+def available_Ns(rbymu, sbymu):
+	"""Population sizes whose simulation output exists and is non-empty in SIM_DIR."""
+	out = []
+	for N in run_simulation.full_Ns:
+		NS,NU,NR = run_simulation.calculate_scaled_parameters(sd,N,sbymu=sbymu,rbymu=rbymu)
+		f = SIM_DIR / run_simulation.output_filename(sd,NS,NU,NR,run_simulation.lbyL)
+		if f.exists() and f.stat().st_size > 0:
+			out.append(N)
+	return out
+
+
+# one entry per recombination rate: every N with a complete run (7 of 11 for R/Lmu=3)
+Nss = [available_Ns(rbymu, sbymus[0]) for rbymu in rbymus]
+print("population sizes per series:", [len(Ns) for Ns in Nss])
 NUn = run_simulation.NUn
 #sds = [1e-02]
 lbyL = run_simulation.lbyL
@@ -42,7 +64,7 @@ for sbymu_idx in range(0,len(sbymus)):
 			NS,NU,NR = run_simulation.calculate_scaled_parameters(sd,N,sbymu=sbymu,rbymu=rbymu)
 				
 			print(sd,N,NS,NU,NR)
-			simulation_results[(sbymu_idx,R_idx)][N] = run_simulation.parse_simulation_output(sd,NS,NU,NR,lbyL)
+			simulation_results[(sbymu_idx,R_idx)][N] = run_simulation.parse_simulation_output(sd,NS,NU,NR,lbyL,directory=SIM_DIR)
 	
 syn_pis = {}
 Npfixs = {}
@@ -200,7 +222,9 @@ for sbymu_idx,R_idx in syn_pis.keys():
 legend_axis.legend(loc='center left',frameon=False,numpoints=1,handletextpad=0.3,handlelength=0.8) #,fontsize=6)  
 
 
-pylab.savefig('forward_time_simulations.pdf',bbox_inches='tight')
+FIG_DIR.mkdir(parents=True, exist_ok=True)
+pylab.savefig(FIG_DIR / 'forward_time_simulations.pdf',bbox_inches='tight')
+print('wrote', FIG_DIR / 'forward_time_simulations.pdf')
 				
 				
 			
