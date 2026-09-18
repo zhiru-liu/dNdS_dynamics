@@ -1,0 +1,43 @@
+{
+  "title": "Dynamics of dN/dS within recombining bacterial populations: analysis code and figure data",
+  "description": "Analysis code, per-pair data tables and figure-reproduction scripts for Liu & Good, \"Dynamics of dN/dS within recombining bacterial populations\". The repository vendors the numerical tables underlying every figure (data/), the scripts that regenerate each figure from them (paper_figures/, with a figure-by-figure guide), the NCBI isolate and quasi-phased metagenome preparation pipelines (analysis/), and the forward-time simulation code.",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "mit",
+  "language": "eng",
+  "creators": [
+    {
+      "name": "Liu, Zhiru",
+      "affiliation": "Department of Applied Physics, Stanford University"
+    },
+    {
+      "name": "Good, Benjamin H.",
+      "affiliation": "Department of Applied Physics and Department of Biology, Stanford University; Chan Zuckerberg Biohub - San Francisco"
+    }
+  ],
+  "keywords": [
+    "dN/dS",
+    "purifying selection",
+    "homologous recombination",
+    "bacterial evolution",
+    "human gut microbiome",
+    "population genetics"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://doi.org/10.1101/2025.09.09.675256",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-preprint"
+    },
+    {
+      "identifier": "https://doi.org/10.5281/zenodo.14853785",
+      "relation": "isDerivedFrom",
+      "resource_type": "dataset"
+    },
+    {
+      "identifier": "https://doi.org/10.6084/m9.figshare.19626912",
+      "relation": "isDerivedFrom",
+      "resource_type": "dataset"
+    }
+  ]
+}
