@@ -18,6 +18,12 @@ It builds on data and methods from Garud & Good (2019) and Liu & Good (2024).
 - **Cultured isolate genomes** — high-quality assemblies retrieved from NCBI
   (see `analysis/download_ncbi_isolates.py`) for the isolate-vs-metagenome
   comparison.
+- ***Staphylococcus aureus* alignment** — 110 genomes from
+  [Everitt et al. (2014)](https://doi.org/10.1038/ncomms4956) as aligned to
+  MRSA252 by [Didelot & Wilson (2015)](https://doi.org/10.1371/journal.pcbi.1004041):
+  `Saureus.fasta` and `Saureus.non-core-sites.txt` in `cfml.tgz` at
+  [figshare, DOI 10.6084/m9.figshare.19626912](https://doi.org/10.6084/m9.figshare.19626912)
+  (CC BY 4.0).
 
 External catalogs and reference genomes live outside the repo; paths are
 configurable in `dnds_dynamics/config.py` (env-overridable).
@@ -34,7 +40,9 @@ configurable in `dnds_dynamics/config.py` (env-overridable).
 - **`paper_figures/`** — scripts that produce the manuscript figures (main text
   and supplement). See [`paper_figures/README.md`](paper_figures/README.md) for a
   table mapping each figure to its generating script.
-- **`data/`** — vendored figure-input tables.
+- **`data/`** — vendored figure-input tables: the per-pair dN/dS tables and
+  other intermediate results every figure is drawn from (listed in
+  [`paper_figures/README.md`](paper_figures/README.md)).
 
 ## Dependencies
 

@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 REPO = Path(__file__).resolve().parents[1]
-SUMMARY = REPO / "outputs" / "typical_dnds_across_species" / "species_summary.csv"
+SUMMARY = REPO / "data" / "typical_dnds_across_species" / "species_summary.csv"
 SMU_SCRIPT = REPO / "paper_figures" / "smu_robustness_typical_grid.py"
 OUT = REPO / "figures" / "typical_dnds_smu_composite"
 VULGATUS = "Bacteroides_vulgatus_57955"

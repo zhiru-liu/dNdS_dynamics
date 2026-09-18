@@ -41,14 +41,19 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "points",
-        nargs="+",
-        help="One or more LABEL=path/to/stratified_dnds_points.csv pairs, in row order.",
+        nargs="*",
+        default=[
+            f"A. putredinis={PROJECT_ROOT / 'data' / 'isolate_dnds' / 'aputredinis' / 'stratified_dnds_points.csv'}",
+            f"P. vulgatus={PROJECT_ROOT / 'data' / 'isolate_dnds' / 'pvulgatus' / 'stratified_dnds_points.csv'}",
+        ],
+        help="One or more LABEL=path/to/stratified_dnds_points.csv pairs, in row order "
+             "(default: the vendored A. putredinis and P. vulgatus tables under data/isolate_dnds/).",
     )
     parser.add_argument("--output-prefix", type=Path, default=DEFAULT_OUTPUT_PREFIX)
     parser.add_argument("--aggregate-label", default="All isolates")
-    parser.add_argument("--fig-width", type=float, default=8.4,
+    parser.add_argument("--fig-width", type=float, default=6.9,
                         help="Figure width in inches (before tight bbox).")
-    parser.add_argument("--row-height", type=float, default=1.0,
+    parser.add_argument("--row-height", type=float, default=1.15,
                         help="Per-row height in inches.")
     parser.add_argument("--png-dpi", type=int, default=300)
     return parser.parse_args()
@@ -81,8 +86,8 @@ def plot_grid(
     output_prefix: Path,
     aggregate_label: str,
     png_dpi: int,
-    fig_width: float = 8.4,
-    row_height: float = 1.0,
+    fig_width: float = 6.9,
+    row_height: float = 1.15,
 ) -> None:
     import matplotlib
 

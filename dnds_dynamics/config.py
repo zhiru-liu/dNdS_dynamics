@@ -135,7 +135,9 @@ fully_recombined_threshold = 0.05
 snv_data_path = GG2019_SNV_FEATHER
 ref_genome_path = GG2019_REP_GENOMES
 LiuGood2024_path = LIUGOOD_ANALYSIS_ROOT
-identical_fraction_path = LIUGOOD_CF_BETWEEN_HOSTS
+# Per-species between-host identical-fraction matrices (Liu & Good 2024); the
+# species used by the clonal-SNV-prevalence figures are vendored under data/.
+identical_fraction_path = _root("DNDS_IDENTICAL_FRACTION_DIR", REPO_ROOT / "data" / "identical_fraction")
 
 
 # ---------------------------------------------------------------------------

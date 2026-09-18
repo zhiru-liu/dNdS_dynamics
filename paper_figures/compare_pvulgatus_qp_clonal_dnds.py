@@ -9,6 +9,9 @@ Two comparisons, overlaid QP vs ISO:
   2. Clonal dN/dS vs clonal dS decay, split by missense and nonsense, using the
      published per_species_dnds Poisson-thinning + adaptive binning + bootstrap.
 
+Inputs (vendored): data/gut_microbiome_*_pair_dNdS/, data/isolate_dnds/pvulgatus{,_extended}/,
+  data/pvulgatus_vs_qp/qp_sample_div_to_ref.csv (env overrides: ISO_DNDS_DIR,
+  ISO_DNDS_EXT_DIR, ISO_IDENT_FRAC).
 Outputs:
   figures/pvulgatus_vs_qp_dnds_comparison.{png,pdf}
   outputs/pvulgatus_vs_qp_dnds/{stratification_summary.csv, clonal_decay_binned.csv}
@@ -24,7 +27,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize_scalar
 
-REPO = Path("/Users/Device6/Documents/Research/bgoodlab/dNdS/dNdS_dynamics_revision")
+REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 os.environ.setdefault("MPLCONFIGDIR", str(REPO / ".cache" / "matplotlib"))
 
@@ -49,14 +52,18 @@ QP_BASE = REPO / "data"
 # pvulgatus_isolate_cphmm run, or the qpcore_extended tract-extension run).
 ISO_DNDS = Path(os.environ.get(
     "ISO_DNDS_DIR",
-    REPO / "outputs" / "pvulgatus_isolate_cphmm_qpcore" / "snv_table" / "dnds",
+    REPO / "data" / "isolate_dnds" / "pvulgatus",
 ))
-ISO_IDENT_FRAC = Path("/Volumes/Botein/ncbi_isolates/Phocaeicola_vulgatus/snv_table/identical_fraction.parquet")
+# Pairwise identical fraction of the P. vulgatus isolates (csv or parquet).
+ISO_IDENT_FRAC = Path(os.environ.get(
+    "ISO_IDENT_FRAC",
+    REPO / "data" / "isolate_dnds" / "pvulgatus" / "identical_fraction.csv",
+))
 # Isolate dN/dS under the 1D-EXTENDED recombination mask (same pairs, more of the
 # genome reclassified clonal->recombined). Overlaid on the clonal-decay row.
 ISO_DNDS_EXT = Path(os.environ.get(
     "ISO_DNDS_EXT_DIR",
-    REPO / "outputs" / "pvulgatus_isolate_cphmm_qpcore_extended" / "snv_table" / "dnds",
+    REPO / "data" / "isolate_dnds" / "pvulgatus_extended",
 ))
 # Harmonize the isolate close-pair selection to QP's published cutoff.
 # NB: microbiome_evolution's "clonal_fraction_cutoff" is computed by
@@ -81,7 +88,7 @@ _CMP_SUFFIX = os.environ.get("CMP_SUFFIX", "")
 OUT_DIR = REPO / "outputs" / f"pvulgatus_vs_qp_dnds{_CMP_SUFFIX}"
 FIG = REPO / "figures" / f"pvulgatus_vs_qp_dnds_comparison{_CMP_SUFFIX}"
 # Clade-membership cache always lives in the canonical (un-suffixed) dir.
-_CLADE_DIR = REPO / "outputs" / "pvulgatus_vs_qp_dnds"
+_CLADE_DIR = REPO / "data" / "pvulgatus_vs_qp"
 # Typical / unrelated-pair tables (fully recombined pairs) for the species-mean
 # anchor point shown in the published clonal-dN/dS grid panels.
 QP_TYPICAL = QP_BASE / "gut_microbiome_typical_pair_dNdS" / f"{SP}.csv"
@@ -188,7 +195,8 @@ def load_qp() -> pd.DataFrame:
 
 
 def _attach_identical_fraction(df: pd.DataFrame) -> pd.DataFrame:
-    ifr = pd.read_parquet(ISO_IDENT_FRAC)
+    ifr = (pd.read_csv(ISO_IDENT_FRAC) if ISO_IDENT_FRAC.suffix == ".csv"
+           else pd.read_parquet(ISO_IDENT_FRAC))
     key = lambda a, b: tuple(sorted((str(a), str(b))))
     ifmap = {key(a, b): f for a, b, f in
              zip(ifr["sample_1"], ifr["sample_2"], ifr["identical_fraction"])}

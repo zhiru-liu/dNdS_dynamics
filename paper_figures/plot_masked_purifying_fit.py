@@ -12,10 +12,11 @@ Variants compared:
   - with-Ap, masked      (requested figure)
   - no-Ap,  masked
 
-Inputs: outputs/masked_clonal_fit/per_pair_masked_clonal_counts.csv
+Inputs: data/qp_extended_recomb/per_pair_extended_for_grid_min2.csv (default;
+  override with --pair-table / --suffix)
 Figures:
-  figures/clonal_dNdS_purifying_fit_withAp_masked.{png,pdf}
-  figures/clonal_dNdS_species_grid_masked.{png,pdf}
+  figures/clonal_dNdS_purifying_fit_withAp_masked_extended_min2.{png,pdf}
+  figures/clonal_dNdS_species_grid_masked_extended_min2.{png,pdf}
 """
 from __future__ import annotations
 
@@ -39,7 +40,7 @@ from dnds_dynamics.figures import per_species_dnds as psd  # noqa: E402
 
 DN = REPO_ROOT / "data"
 TYPICAL_DIR = DN / "gut_microbiome_typical_pair_dNdS"
-PAIR_TABLE = REPO_ROOT / "outputs" / "masked_clonal_fit" / "per_pair_masked_clonal_counts.csv"
+PAIR_TABLE = REPO_ROOT / "data" / "qp_extended_recomb" / "per_pair_extended_for_grid_min2.csv"
 FIG_FIT = REPO_ROOT / "figures" / "clonal_dNdS_purifying_fit_withAp_masked"
 FIG_GRID = REPO_ROOT / "figures" / "clonal_dNdS_species_grid_masked"
 AP = "Alistipes_putredinis_61533"
@@ -165,7 +166,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pair-table", type=Path, default=PAIR_TABLE,
                     help="per-pair counts; mask cols rm1/rm4 or moved_1d/moved_4d")
-    ap.add_argument("--suffix", default="", help="appended to output figure names")
+    ap.add_argument("--suffix", default="_extended_min2", help="appended to output figure names")
     args = ap.parse_args()
     global FIG_FIT, FIG_GRID
     if args.suffix:
