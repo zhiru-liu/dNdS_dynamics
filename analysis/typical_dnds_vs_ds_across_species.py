@@ -42,7 +42,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-REPO = Path("/Users/Device6/Documents/Research/bgoodlab/dNdS/dNdS_dynamics_revision")
+REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 os.environ.setdefault("MPLCONFIGDIR", str(REPO / ".cache" / "matplotlib"))
 

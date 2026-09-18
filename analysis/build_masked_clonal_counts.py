@@ -26,9 +26,12 @@ import numpy as np
 import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-LIUGOOD_PKG = Path("/Users/Device6/Documents/Research/bgoodlab/LiuGood2024_data")
-SNV_FEATHER = Path("/Volumes/Botein/GarudGood2019_snvs/snvs_feather")
-DN = Path("/Users/Device6/Documents/Research/bgoodlab/dNdS/dNdS_dynamics/data")
+sys.path.insert(0, str(REPO_ROOT))
+from dnds_dynamics import config  # noqa: E402
+from dnds_dynamics.snv_helpers.qp import load_qp_snv_helper  # noqa: E402
+
+SNV_FEATHER = config.GG2019_SNV_FEATHER
+DN = config.data_path
 CLOSE_DIR = DN / "gut_microbiome_close_pair_dNdS"
 CLONAL_DIR = DN / "gut_microbiome_clonal_pair_dNdS"
 TRANSFERS = DN / "gut_microbiome_transfers.csv"
@@ -50,16 +53,8 @@ def eligible_species() -> list[str]:
 
 
 def load_helper(species: str):
-    cwd = os.getcwd()
-    try:
-        os.chdir(LIUGOOD_PKG)
-        if str(LIUGOOD_PKG) not in sys.path:
-            sys.path.insert(0, str(LIUGOOD_PKG))
-        from snv_utils import SNVHelper
-    finally:
-        os.chdir(cwd)
-    return SNVHelper(species, snv_path=SNV_FEATHER, snv_format="feather",
-                     compute_bi_snvs=False, annotate=True, mask_multi_sites=True)
+    return load_qp_snv_helper(species, annotate=True, compute_bi_snvs=False,
+                              mask_multi_sites=True)
 
 
 def transfers_by_pair(species: str) -> dict:

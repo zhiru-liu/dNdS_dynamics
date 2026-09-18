@@ -556,7 +556,7 @@ def main():
                         help="Output table dir (default: <isolate-dir>/snv_table).")
     parser.add_argument("--max-isolates", type=int, default=0, help="0 = all")
     parser.add_argument("--qp-catalog-dir", type=Path,
-                        default=Path("/Volumes/Botein/GarudGood2019_snvs/snvs_feather"),
+                        default=config.GG2019_SNV_FEATHER,
                         help="QP catalog dir; its coverage table defines the reused MIDAS core genes "
                              "(only used when --core-gene-source qp).")
     parser.add_argument("--core-gene-source", choices=("qp", "none"), default="qp",

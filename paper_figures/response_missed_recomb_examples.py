@@ -30,13 +30,15 @@ MPL_CACHE_DIR = REPO_ROOT / ".cache" / "matplotlib"
 MPL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 os.environ.setdefault("MPLCONFIGDIR", str(MPL_CACHE_DIR))
 
+from dnds_dynamics import config  # noqa: E402
 from dnds_dynamics.snv_helpers.isolate import IsolateSNVHelper  # noqa: E402
+from dnds_dynamics.snv_helpers.qp import load_qp_snv_helper  # noqa: E402
 
-LIUGOOD_PKG = Path("/Users/Device6/Documents/Research/bgoodlab/LiuGood2024_data")
-SNV_FEATHER = Path("/Volumes/Botein/GarudGood2019_snvs/snvs_feather")
-DN = Path("/Users/Device6/Documents/Research/bgoodlab/dNdS/dNdS_dynamics/data")
 SPECIES = "Alistipes_putredinis_61533"
-ISO_ROOT = Path("/Volumes/Botein/ncbi_isolates/Alistipes_putredinis")
+# CP-HMM transfers (Liu & Good 2024 supplement; local, git-ignored) and the
+# A. putredinis isolate SNV tables (external; see config.NCBI_ISOLATES_ROOT).
+TRANSFERS = config.data_path / "gut_microbiome_transfers.csv"
+ISO_ROOT = config.NCBI_ISOLATES_ROOT / "Alistipes_putredinis"
 FIG_ZOOM = REPO_ROOT / "figures" / "response_missed_recomb_examples"
 FIG_GW = REPO_ROOT / "figures" / "response_missed_recomb_genomewide"
 WIN = 1000
@@ -44,16 +46,8 @@ RED = "#c0392b"; BLUE = "#2b6cb0"; TRACT = "#f6c026"; DET = "0.82"
 
 
 def load_qp():
-    cwd = os.getcwd()
-    try:
-        os.chdir(LIUGOOD_PKG)
-        if str(LIUGOOD_PKG) not in sys.path:
-            sys.path.insert(0, str(LIUGOOD_PKG))
-        from snv_utils import SNVHelper
-    finally:
-        os.chdir(cwd)
-    return SNVHelper(SPECIES, snv_path=SNV_FEATHER, snv_format="feather",
-                     compute_bi_snvs=False, annotate=True, mask_multi_sites=True)
+    return load_qp_snv_helper(SPECIES, annotate=True, compute_bi_snvs=False,
+                              mask_multi_sites=True)
 
 
 def _intervals_from_mask(sc, sp, mask, gap=2000):
@@ -97,7 +91,7 @@ def qp_example():
     per = {}
     for c in np.unique(sc):
         gi = np.flatnonzero(sc == c); o = np.argsort(sp[gi]); per[c] = (sp[gi][o], gi[o])
-    tr = pd.read_csv(DN / "gut_microbiome_transfers.csv", low_memory=False)
+    tr = pd.read_csv(TRANSFERS, low_memory=False)
     tr = tr[tr["Species name"] == SPECIES].dropna(
         subset=["Reference contig", "Reference genome start loc", "Reference genome end loc"])
     trp = {}

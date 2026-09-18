@@ -23,9 +23,10 @@ REPO = Path(__file__).resolve().parents[1]
 os.environ.setdefault("MPLCONFIGDIR", str(REPO / ".cache" / "matplotlib"))
 sys.path.insert(0, str(REPO))
 from cphmm.tract_extension import extend_tracts_by_1d_density  # noqa: E402
+from dnds_dynamics import config  # noqa: E402
 from dnds_dynamics.snv_helpers.qp import load_qp_snv_helper  # noqa: E402
 
-FEATHER = Path("/Volumes/Botein/GarudGood2019_snvs/snvs_feather")
+FEATHER = config.GG2019_SNV_FEATHER
 DN = REPO / "data"
 CLOSE_DIR = DN / "gut_microbiome_close_pair_dNdS"
 TRANSFERS = DN / "gut_microbiome_transfers.csv"

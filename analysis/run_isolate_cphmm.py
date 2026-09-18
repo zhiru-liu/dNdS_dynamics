@@ -39,6 +39,7 @@ import pandas as pd
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
+from dnds_dynamics import config  # noqa: E402
 from dnds_dynamics.recombination.cphmm_isolate import (  # noqa: E402
     IsolateCPHMMDataHelper,
     build_and_save_cache,
@@ -46,7 +47,7 @@ from dnds_dynamics.recombination.cphmm_isolate import (  # noqa: E402
     write_inference_csvs,
 )
 
-ISOLATE_ROOT = Path("/Volumes/Botein/ncbi_isolates")
+ISOLATE_ROOT = config.NCBI_ISOLATES_ROOT
 
 # Per-species presets. ``midas_species`` selects the QP/MIDAS reference (and the
 # core_genes.json reused from the matching QP catalog). Both species are single

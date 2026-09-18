@@ -19,13 +19,18 @@ import argparse
 import gzip
 import json
 import shutil
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-QP_DEFAULT = Path("/Volumes/Botein/GarudGood2019_snvs/snvs_feather")
-REF_DEFAULT = Path("/Volumes/Botein/GarudGood2019_snvs/midas_db_data/rep_genomes")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+from dnds_dynamics import config  # noqa: E402
+
+QP_DEFAULT = config.GG2019_SNV_FEATHER
+REF_DEFAULT = config.GG2019_REP_GENOMES
 MIN_CONTIG_LEN = 2000
 CORE_GENE_QP_FRAC = 0.5  # gene is core if >= this fraction of its sites are QP-core
 

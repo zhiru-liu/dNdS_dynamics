@@ -28,17 +28,20 @@ def _root(env_var: str, default: str | Path) -> Path:
     return Path(os.environ.get(env_var, str(default))).expanduser()
 
 
+#: This repository (``<bgoodlab>/dNdS/dNdS_dynamics_revision``).
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
 # ---------------------------------------------------------------------------
 # Top-level roots (override these to relocate everything below)
 # ---------------------------------------------------------------------------
 #: External data drive holding SNV catalogs, isolate tables, analysis pickles.
 BOTEIN_ROOT = _root("DNDS_BOTEIN_ROOT", "/Volumes/Botein")
-#: Parent of the sibling research repos (close_pair_hmm, LiuGood2024_data, ...).
-BGOODLAB_ROOT = _root(
-    "DNDS_BGOODLAB_ROOT", "/Users/Device6/Documents/Research/bgoodlab"
-)
+#: Parent of the sibling research repos (close_pair_hmm, ...); by default the
+#: grandparent of this repo (``<bgoodlab>/dNdS/<this repo>``).
+BGOODLAB_ROOT = _root("DNDS_BGOODLAB_ROOT", REPO_ROOT.parents[1])
 #: Parent of external command-line tools (MUMmer, NCBI datasets).
-TOOLS_ROOT = _root("DNDS_TOOLS_ROOT", "/Users/Device6/Documents/Research/tools")
+TOOLS_ROOT = _root("DNDS_TOOLS_ROOT", Path.home() / "Documents" / "Research" / "tools")
 
 
 # ---------------------------------------------------------------------------
@@ -122,7 +125,6 @@ DATASETS_BIN = _root("DNDS_DATASETS_BIN", TOOLS_ROOT / "datasets")
 # ``data/``; ``gut_microbiome_transfers.csv`` (44 MB, the Liu & Good 2024
 # supplementary table pbio.3002472.s003) is kept locally but git-ignored.
 # ---------------------------------------------------------------------------
-REPO_ROOT = Path(__file__).resolve().parents[1]
 data_path = _root("DNDS_DATA_DIR", REPO_ROOT / "data")
 fig_dat_path = data_path / "figure_data"
 fig_path = _root("DNDS_FIG_DIR", REPO_ROOT / "figures")
